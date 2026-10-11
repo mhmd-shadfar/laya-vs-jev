@@ -119,6 +119,7 @@ h1 .jev{background:linear-gradient(90deg,var(--jev),var(--jev2));
   box-shadow:inset 0 -1px 0 rgba(0,0,0,.15), 0 0 12px color-mix(in srgb,var(--laya) 25%,transparent)}
 .bar.jev{background:linear-gradient(90deg,var(--jev2),var(--jev));
   box-shadow:inset 0 -1px 0 rgba(0,0,0,.15), 0 0 12px color-mix(in srgb,var(--jev) 22%,transparent)}
+.bar.base{background:color-mix(in srgb,var(--muted) 55%,var(--track))}
 .brow .val{width:52px;flex:none;font-size:13px;font-weight:600;
   font-variant-numeric:tabular-nums}
 .foot{color:var(--muted);font-size:12px;text-align:center;margin-top:26px}
@@ -206,6 +207,7 @@ support intent routing   and compared accuracy on every single case.</p>
   <div class="side"><div class="num" style="color:var(--laya)" id="avgL">–</div><div class="lab">Laya average</div></div>
   <div class="mid"><span class="badge" id="deltaAvg"></span><div class="avg" style="margin-top:8px">average accuracy</div></div>
   <div class="side"><div class="num" style="color:var(--jev)" id="avgJ">–</div><div class="lab">Jev average</div></div>
+  <div class="side"><div class="num" style="color:var(--muted)" id="avgB">–</div><div class="lab">Laya base (multilingual)</div></div>
 </div>
 <div id="cards"></div>
 <p class="foot">Same story on every subset   fine-tuned Laya comes out ahead.</p>
@@ -470,10 +472,10 @@ try{ showCat(localStorage.getItem("excat")||"spam") }catch(e){ showCat("spam") }
 
 // ---- race data ----
 const SUBSETS = [
-  {name:"retail_shopping", n:3359, acc:[.940,.845]},
-  {name:"sentiment_moderation", n:4394, acc:[.858,.726]},
-  {name:"spam_detection", n:271, acc:[.985,.967]},
-  {name:"support_intent_routing", n:2087, acc:[.981,.905]},
+  {name:"retail_shopping", n:3359, acc:[.940,.845], base:.349},
+  {name:"sentiment_moderation", n:4394, acc:[.858,.726], base:.615},
+  {name:"spam_detection", n:271, acc:[.985,.967], base:.900},
+  {name:"support_intent_routing", n:2087, acc:[.981,.905], base:.689},
 ];
 const avg = a => a.reduce((s,v)=>s+v,0)/a.length;
 const pct = v => (v*100).toFixed(1);
@@ -482,6 +484,7 @@ const avgL = avg(SUBSETS.map(s=>s.acc[0])), avgJ = avg(SUBSETS.map(s=>s.acc[1]))
 document.getElementById("avgL").textContent = pct(avgL)+"%";
 document.getElementById("avgJ").textContent = pct(avgJ)+"%";
 document.getElementById("deltaAvg").textContent = "+"+((avgL-avgJ)*100).toFixed(1)+" pts for Laya";
+document.getElementById("avgB").textContent = pct(avg(SUBSETS.map(s=>s.base)))+"%";
 
 const holder = document.getElementById("cards");
 for (const s of SUBSETS) {
@@ -494,6 +497,9 @@ for (const s of SUBSETS) {
       <div class="brow"><span class="name">Laya (ft)</span>
         <div class="track"><div class="bar laya" data-w="${pct(a)}"></div></div>
         <span class="val" style="color:var(--laya)">${a.toFixed(3)}</span></div>
+      <div class="brow"><span class="name">Laya base</span>
+        <div class="track"><div class="bar base" data-w="${pct(s.base)}"></div></div>
+        <span class="val" style="color:var(--muted)">${s.base.toFixed(3)}</span></div>
       <div class="brow"><span class="name">Jev-1.13</span>
         <div class="track"><div class="bar jev" data-w="${pct(b)}"></div></div>
         <span class="val" style="color:var(--jev)">${b.toFixed(3)}</span></div>
