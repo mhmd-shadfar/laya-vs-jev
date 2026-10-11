@@ -1,0 +1,508 @@
+<title>Laya vs Jev</title>
+<style>
+:root{
+  --bg:#0b1016; --ink:#eef3f7; --muted:#8b9bab;
+  --card:#121a23; --line:#22303d; --track:#1a2530;
+  --laya:#2dd4bf; --laya2:#14b8a6; --jev:#fb923c; --jev2:#f97316;
+  --win:#34d399;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#eef2f5; --ink:#16202a; --muted:#5d6e7c;
+  --card:#ffffff; --line:#dde5ea; --track:#e8edf1;
+  --laya:#0d9488; --laya2:#0f766e; --jev:#f97316; --jev2:#ea580c;
+  --win:#059669;
+}}
+:root[data-theme="dark"]{
+  --bg:#0b1016; --ink:#eef3f7; --muted:#8b9bab;
+  --card:#121a23; --line:#22303d; --track:#1a2530;
+  --laya:#2dd4bf; --laya2:#14b8a6; --jev:#fb923c; --jev2:#f97316;
+  --win:#34d399;
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+  radial-gradient(900px 400px at 15% -10%, rgba(45,212,191,.08), transparent 60%),
+  radial-gradient(900px 400px at 85% -10%, rgba(251,146,60,.07), transparent 60%),
+  var(--bg);
+  color:var(--ink); font:15px/1.5 system-ui,-apple-system,sans-serif;
+  padding:0 20px 64px}
+main{max-width:760px;margin:0 auto}
+
+/* top nav */
+nav{position:sticky;top:0;z-index:5;display:flex;gap:8px;justify-content:center;
+  padding:14px 0;background:linear-gradient(var(--bg) 75%,transparent);margin:0 -20px}
+nav button{cursor:pointer;font:inherit;font-size:13.5px;font-weight:600;
+  padding:8px 20px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card);color:var(--muted);transition:all .2s}
+nav button:hover{color:var(--ink);border-color:var(--muted)}
+nav button.on{color:#06201d;background:linear-gradient(90deg,var(--laya2),var(--laya));
+  border-color:transparent;box-shadow:0 0 16px color-mix(in srgb,var(--laya) 35%,transparent)}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) nav button.on{color:#fff} }
+:root[data-theme="dark"] nav button.on{color:#06201d}
+/* category sub-tabs (examples page) */
+.cats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:22px 0 18px}
+.cats button,.pbtn{cursor:pointer;font:inherit;font-size:13px;font-weight:600;
+  padding:7px 18px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card);color:var(--muted);transition:all .2s}
+.cats button:hover,.pbtn:hover{color:var(--ink);border-color:var(--muted)}
+.cats button.on,.pbtn.on{color:#06201d;background:linear-gradient(90deg,var(--laya2),var(--laya));
+  border-color:transparent;box-shadow:0 0 16px color-mix(in srgb,var(--laya) 35%,transparent)}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) .cats button.on{color:#fff} }
+:root[data-theme="dark"] .cats button.on{color:#06201d}
+.jstate{direction:ltr;text-align:left;font-family:ui-monospace,monospace;font-size:12px;
+  line-height:1.55;background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:10px 12px;color:var(--muted);margin:0 0 10px;overflow-x:auto;white-space:pre}
+/* real answer choices, straight from the dataset */
+.opts{margin:10px 0 0}
+.opts .ol{font-size:11px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;
+  color:var(--muted);margin:0 0 6px}
+.opts .fa-q{display:block;direction:rtl;text-align:right;text-transform:none;letter-spacing:0;
+  font-weight:500;font-size:12.5px;color:var(--ink);margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-block;background:var(--card);border:1px solid var(--line);
+  border-radius:999px;padding:3px 11px;font-size:12px;color:var(--ink);direction:rtl}
+.chip code{font-family:ui-monospace,monospace;font-size:11px;color:var(--muted);
+  direction:ltr;unicode-bidi:embed}
+.chip.win{background:color-mix(in srgb,var(--win) 13%,transparent);
+  border-color:color-mix(in srgb,var(--win) 38%,transparent)}
+.chip.win code{color:var(--win);font-weight:600}
+.opts .note{font-size:11.5px;color:var(--muted);margin:7px 0 0}
+/* side-by-side comparison columns */
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.vs-col{background:var(--track);border:1px solid var(--line);border-radius:12px;
+  padding:12px 16px}
+.vs-col p{margin:8px 0 0;line-height:1.65}
+.vs-h{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+  color:var(--muted);margin:0}
+.vs-h.l{color:var(--muted);font-size:12px}
+@media(max-width:560px){.vs-grid{grid-template-columns:1fr}}
+
+h1{font-size:32px;font-weight:700;margin:12px 0 6px;letter-spacing:-.8px;text-wrap:balance}
+h1 .laya{background:linear-gradient(90deg,var(--laya),var(--laya2));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+h1 .vs{color:var(--muted);font-weight:400;font-size:.75em;margin:0 4px}
+h1 .jev{background:linear-gradient(90deg,var(--jev),var(--jev2));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);margin:0 0 28px;font-size:14px}
+
+/* summary strip */
+.summary{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:18px 22px;margin:0 0 12px}
+.summary .side{text-align:center}
+.summary .num{font-size:34px;font-weight:750;letter-spacing:-1px;
+  font-variant-numeric:tabular-nums}
+.summary .lab{font-size:12px;color:var(--muted);margin-top:2px}
+.summary .mid{text-align:center;color:var(--muted);font-size:12px}
+.summary .avg{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12.5px;
+  font-weight:600;background:color-mix(in srgb,var(--win) 14%,transparent);
+  color:var(--win);border:1px solid color-mix(in srgb,var(--win) 30%,transparent)}
+
+/* subset cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:18px 20px 20px;margin:0 0 12px}
+.chead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  margin:0 0 14px}
+.chead h3{font-size:15px;font-weight:650;margin:0;letter-spacing:-.2px}
+.delta{font-size:12px;font-weight:650;font-variant-numeric:tabular-nums;
+  padding:3px 10px;border-radius:999px;white-space:nowrap;
+  background:color-mix(in srgb,var(--win) 13%,transparent);
+  color:var(--win);border:1px solid color-mix(in srgb,var(--win) 28%,transparent)}
+.mrow{margin:0}
+.brow + .brow{margin-top:12px}
+.brow{display:flex;align-items:center;gap:10px}
+.brow .name{width:110px;flex:none;font-size:12px;color:var(--muted);text-align:right}
+.track{flex:1;height:22px;background:var(--track);border-radius:6px;overflow:hidden}
+.bar{height:100%;border-radius:6px;min-width:4px;
+  width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.bar.laya{background:linear-gradient(90deg,var(--laya2),var(--laya));
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.15), 0 0 12px color-mix(in srgb,var(--laya) 25%,transparent)}
+.bar.jev{background:linear-gradient(90deg,var(--jev2),var(--jev));
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.15), 0 0 12px color-mix(in srgb,var(--jev) 22%,transparent)}
+.brow .val{width:52px;flex:none;font-size:13px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:26px}
+
+/* blog page */
+.post{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:28px 30px;margin-top:12px}
+.post h2{font-size:22px;font-weight:700;letter-spacing:-.4px;margin:0 0 6px;
+  padding-bottom:14px;border-bottom:1px solid var(--line)}
+.post .body p{margin:14px 0;color:var(--ink)}
+.post .body{color:var(--ink);font-size:14.5px;line-height:1.7}
+.post .body strong{color:var(--ink)}
+.kw{background:linear-gradient(90deg,var(--laya2),var(--laya));
+  -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+.kw-j{background:linear-gradient(90deg,var(--jev2),var(--jev));
+  -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+.sec{margin:26px 0 0;font-size:16px;font-weight:700;letter-spacing:-.2px}
+.sec span{display:inline-block;padding-left:10px;border-left:3px solid var(--laya)}
+.post .body code{background:var(--track);border:1px solid var(--line);
+  border-radius:5px;padding:1px 6px;font-size:12.5px;font-family:ui-monospace,monospace}
+.post ul{margin:10px 0;padding-left:20px}
+.post li{margin:8px 0}
+.fa{direction:rtl;text-align:right;margin:8px 0;
+  border-right:3px solid var(--line);padding-right:12px;color:var(--ink)}
+.fa-src{color:var(--muted);font-size:13px;direction:ltr;text-align:left;
+  border-left:3px solid var(--line);padding-left:12px;margin:4px 0 14px}
+table{border-collapse:collapse;margin:14px auto;font-size:13.5px;width:100%}
+th,td{padding:8px 12px;text-align:left}
+th{color:var(--muted);font-size:12px;text-transform:uppercase;
+  letter-spacing:.6px;border-bottom:1px solid var(--line)}
+tr+tr td{border-top:1px solid var(--line)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.hl{color:var(--laya);font-weight:650}
+.famono{font-family:ui-monospace,monospace;font-size:.95em;color:var(--laya)}
+a.hf{font-family:ui-monospace,monospace;font-size:.95em;color:var(--laya);
+  text-decoration:none;border-bottom:1px dotted color-mix(in srgb,var(--laya) 50%,transparent)}
+a.hf:hover{border-bottom-style:solid}
+.tagline{color:var(--muted);font-size:13px;margin:0 0 4px;padding:0}
+/* example cards */
+.ex{margin:16px 0;background:var(--track);border:1px solid var(--line);border-radius:12px;
+  padding:12px 16px 14px}
+.ex p.fa{margin:0 0 8px;border-right:3px solid var(--laya);padding:0 12px 0 0;background:none}
+.ex-t{margin:0;font-size:13.5px;line-height:1.65;color:var(--muted)}
+.ex-t code{background:var(--card)}
+.tag{display:inline-block;background:color-mix(in srgb,var(--laya) 16%,transparent);
+  color:var(--laya);font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;border:1px solid color-mix(in srgb,var(--laya) 30%,transparent);
+  border-radius:999px;padding:2px 10px;margin-right:8px;vertical-align:1px}
+/* code page */
+pre.code{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;font-family:ui-monospace,monospace;font-size:12.5px;line-height:1.65;
+  color:var(--ink);overflow-x:auto;margin:10px 0 18px;direction:ltr;text-align:left;
+  white-space:pre}
+pre.code .c{color:var(--muted)}
+pre.code .s{color:var(--win)}
+pre.code .k{color:var(--laya);font-weight:600}
+/* end-of-post CTA */
+.cta{text-align:center;margin:30px 0 6px}
+.cta .lead{color:var(--muted);font-size:14px;margin:0 0 14px}
+.cta button{cursor:pointer;font:inherit;font-size:15px;font-weight:700;
+  padding:12px 34px;border-radius:999px;border:none;
+  background:linear-gradient(90deg,var(--laya2),var(--laya));color:#06201d;
+  box-shadow:0 0 22px color-mix(in srgb,var(--laya) 35%,transparent);
+  transition:transform .15s}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) .cta button{color:#fff} }
+:root[data-theme="dark"] .cta button{color:#06201d}
+.cta button:hover{transform:translateY(-2px)}
+</style>
+</head>
+<nav>
+  <button id="tab-story" onclick="show('story')">How it was built</button>
+  <button id="tab-race" onclick="show('race')">The race</button>
+  <button id="tab-ex" onclick="show('ex')">Examples</button>
+  <button id="tab-code" onclick="show('code')">Try it yourself</button>
+</nav>
+<main>
+
+<!-- ============ PAGE 1: charts ============ -->
+<section id="page-race">
+<h1><span class="laya">Laya fine-tuned</span><span class="vs">vs</span><span class="jev">Jev-1.13</span></h1>
+<p class="sub">We ran the fine-tuned Laya model head-to-head with Jev-1.13 on
+four test sets   retail shopping, sentiment moderation, spam detection, and
+support intent routing   and compared accuracy on every single case.</p>
+<div class="summary">
+  <div class="side"><div class="num" style="color:var(--laya)" id="avgL">–</div><div class="lab">Laya average</div></div>
+  <div class="mid"><span class="badge" id="deltaAvg"></span><div class="avg" style="margin-top:8px">average accuracy</div></div>
+  <div class="side"><div class="num" style="color:var(--jev)" id="avgJ">–</div><div class="lab">Jev average</div></div>
+</div>
+<div id="cards"></div>
+<p class="foot">Same story on every subset   fine-tuned Laya comes out ahead.</p>
+</section>
+
+<!-- ============ PAGE 2: blog ============ -->
+<section id="page-story" style="display:none">
+<h1>Teaching Laya Persian</h1>
+<p class="tagline">Fine-tuning a System&nbsp;1 decision model and racing it against a closed-source API.</p>
+<div class="post"><div class="body">
+
+<p>Ever read Daniel Kahneman? LLMs have the same split. <strong>System&nbsp;2</strong> is the big autoregressive model. it reads your prompt, generates tokens one at a time, reasons, and answers. Powerful but slow and expensive, a full pass over every response for every question. <strong class="kw">System&nbsp;1</strong> is the fast reflex. given a situation and a concrete question, it fires back a decision <em>now</em>, with a probability attached.</p>
+<p>And most real products are drowning in System&nbsp;1. Was this message spam? Does the customer want a refund? Is this review positive? Every one of those deserves an instant, calibrated answer routing each through a generative workflow is overkill.</p>
+
+<div class="sec"><span>What makes Laya different from a normal classifier</span></div>
+<p>The model I fine-tuned is Laya's <strong>multilingual</strong> checkpoint, from <a class="hf" href="https://huggingface.co/convaiinnovations/laya" target="_blank" rel="noopener">convaiinnovations/laya</a>. It's a non-autoregressive System&nbsp;1 decision model: it never generates text   a state plus typed questions go in, typed answers with calibrated probabilities come out in a single forward pass (~33&nbsp;ms), nothing to parse. Its encoder is a mmBERT   22 layers, 256k vocab, bidirectional attention, and a context window up to 8k tokens where classic BERT tops out at 512. That's the boring part, honestly. The interesting difference is <em>how</em> it answers, so let's line the two up side by side:</p>
+<div class="vs-grid">
+  <div class="vs-col">
+    <div class="vs-h">Classic classifier</div>
+    <p>The output space is <strong>fixed at design time</strong>. Train a sentiment classifier and, as the developer, you already know before writing any code that it will only ever output positive&nbsp;/&nbsp;negative&nbsp;/&nbsp;neutral   so you just wire that head into the network while designing it. One head, one job: want a second task, train a second model.</p>
+  </div>
+  <div class="vs-col">
+    <div class="vs-h" style="color:var(--laya)">Laya</div>
+    <p>Can't have a fixed output head, because it's built to be <em>universal</em>. It has to understand the state through language modeling itself and then pick from whatever options the caller sent   a list that could be arbitrarily large or descriptive. There's no pre-wired head for positive/negative/neutral, because there's no knowing what you'll ask.</p>
+  </div>
+</div>
+<p>That one design decision buys two things:</p>
+<ul>
+  <li><strong>One model, any question.</strong> At runtime you send a <em>state</em> plus any set of <em>questions</em> in three flavors   <em>choice</em> (pick from any list of options you provide), <em>score</em> (rate over named levels), and <em>noul</em> (plain yes/no). The same checkpoint fine-tuned on Persian customer service handles all three, because the format is learned, not wired into a head.</li>
+  <li><strong>It can't hallucinate labels.</strong> It's architecturally forced to choose only among the options the user sent and assign each one a probability   nothing outside the list can come out of the wire format. The answer can still be wrong (training data is never perfect), but it can't invent an option you never offered.</li>
+</ul>
+<p>Training is <strong>RLCD-style contrastive learning</strong>: the model is rewarded not just for the right label, but for <strong>calibrated probabilities</strong>   its distribution is scored against the gold distribution, so "85% sure" actually means 85%.</p>
+
+<div class="sec"><span>The Farsi dataset</span></div>
+<p>I took four decision-making domains, converted them to the typed-decisions format   <code>state</code>, <code>questions</code>, and a gold that carries soft distributions (e.g. <code>{false: 0.88, true: 0.12}</code> instead of a bare label)   and machine-translated the whole thing to Persian: about <strong>48k training cases</strong> and roughly 10k held-out test cases.</p>
+<table>
+  <tr><th>Domain</th><th class="num">Train cases</th><th class="num">Test cases</th><th>Question</th></tr>
+  <tr><td>retail_shopping</td><td class="num">16,358</td><td class="num">3,359</td><td>did this shopping session end in a purchase?</td></tr>
+  <tr><td>sentiment_moderation</td><td class="num">20,555</td><td class="num">4,394</td><td>moderation/sentiment, score 0–4 + yes/no flags</td></tr>
+  <tr><td>spam_detection</td><td class="num">1,116</td><td class="num">271</td><td>is this SMS spam?</td></tr>
+  <tr><td>support_intent_routing</td><td class="num">10,449</td><td class="num">2,087</td><td>which support intent matches the message?</td></tr>
+</table>
+<p>Want to see what the training data actually looks like?</p>
+<p><button class="pbtn" onclick="show('ex');return false">See the examples →</button></p>
+
+<div class="sec"><span>Fine-tuning</span></div>
+<p>Starting from the multilingual Laya checkpoint (<code>convaiinnovations/laya</code>), each domain got its own fine-tuned model   4 epochs with the standard RLCD trainer   and all are up on Hugging&nbsp;Face:</p>
+<ul>
+  <li><strong>Retail shopping:</strong> <a class="hf" href="https://huggingface.co/mo-shadfar/laya-fa-retail-shopping" target="_blank" rel="noopener">mo-shadfar/laya-fa-retail-shopping</a></li>
+  <li><strong>Sentiment / moderation:</strong> <a class="hf" href="https://huggingface.co/mo-shadfar/laya-fa-sentiment-moderation" target="_blank" rel="noopener">mo-shadfar/laya-fa-sentiment-moderation</a></li>
+  <li><strong>Spam detection:</strong> <a class="hf" href="https://huggingface.co/mo-shadfar/laya-fa-spam-detection" target="_blank" rel="noopener">mo-shadfar/laya-fa-spam-detection</a></li>
+  <li><strong>Intent routing:</strong> <a class="hf" href="https://huggingface.co/mo-shadfar/laya-fa-intent-routing" target="_blank" rel="noopener">mo-shadfar/laya-fa-intent-routing</a></li>
+</ul>
+<p><button class="pbtn" onclick="show('code');return false">Try it yourself →</button></p>
+
+<div class="sec"><span>The takeaway</span></div>
+<p>For the reflex layer of an LLM product   spam, intent routing, sentiment, any "answer now" question   a small fine-tuned encoder you own beats a closed-source API on accuracy and destroys it on latency. The model is public; go fine-tune it on your own domain.</p>
+
+<div class="cta">
+  <p class="lead">Numbers over claims,   see how this model raced Jev-1.13 on all four test sets.</p>
+  <button onclick="show('race')">See the results →</button>
+</div>
+
+</div></div>
+</section>
+
+<!-- ============ PAGE 3: examples ============ -->
+<section id="page-ex" style="display:none">
+<h1>Real examples</h1>
+<p class="sub">Actual rows from the training file. The data itself
+is entirely in Persian   the English on each card is just my translation for you, not
+text the model ever saw.</p>
+<div class="cats">
+  <button id="cat-spam" onclick="showCat('spam')">Spam</button>
+  <button id="cat-sent" onclick="showCat('sent')">Sentiment</button>
+  <button id="cat-intent" onclick="showCat('intent')">Intent routing</button>
+  <button id="cat-retail" onclick="showCat('retail')">Retail</button>
+</div>
+
+<div id="catp-spam">
+<div class="ex">
+  <p class="fa">شما به طور ویژه برای دریافت جایزه ۳۰۰۰ دلار انتخاب شده‌اید! قبل از بسته شدن خطوط با شماره ۰۸۷۱۲۴۰۲۰۵۰ تماس بگیرید.</p>
+  <div class="opts">
+    <p class="ol">Question:</p>
+    <p class="fa-q">آیا این پیامک باید به عنوان اسپم (هرزنامه) طبقه‌بندی شود؟</p>
+    <div class="chips"><span class="chip win">true</span><span class="chip">false</span></div>
+  </div>
+  <p class="ex-t">"You have been specially selected to receive a $3,000 prize! Call this number before the lines close."   a classic scam SMS, and exactly what the filter exists to catch: fake urgency, a prize, and a phone number to call.</p>
+</div>
+<div class="ex">
+  <p class="fa">اووه، من کلی از این‌ها دارم!</p>
+  <div class="opts">
+    <p class="ol">Question:</p>
+    <p class="fa-q">آیا این پیامک باید به عنوان اسپم (هرزنامه) طبقه‌بندی شود؟</p>
+    <div class="chips"><span class="chip">true</span><span class="chip win">false</span></div>
+  </div>
+  <p class="ex-t">"Ooh, I have a bunch of these!"   casual chit-chat, no sales pitch, so it's labeled not spam. This is the tricky half of the job: a sentence that looks odd but is still just a human talking.</p>
+</div>
+</div>
+
+<div id="catp-sent" style="display:none">
+<div class="ex">
+  <p class="fa">ریک، می‌دونی که داری دقیقاً ویژگی‌های هیلاری کلینتون، بیل کلینتون و اوباما رو توصیف می‌کنی، نه؟ تو یه ریاکاری.</p>
+  <div class="opts">
+    <p class="ol">Score levels — pick one:</p>
+    <p class="fa-q">کدام بازه با رتبه‌بندی سمیت ارزیابان برای این نظر مطابقت دارد؟</p>
+    <div class="chips">
+      <span class="chip">بسیار کم: زیر 0.2 <code>very low</code></span>
+      <span class="chip">کم: 0.2 تا زیر 0.5 <code>low</code></span>
+      <span class="chip win">متوسط: 0.5 تا زیر 0.8 <code>medium</code></span>
+      <span class="chip">زیاد: حداقل 0.8 <code>high</code></span>
+    </div>
+    <p class="note">Same row also carries a binary <code>toxic_comment</code> flag plus threat / insult / identity-attack / obscene sub-flags — all answered in one pass.</p>
+  </div>
+  <p class="ex-t">"Rick, did you realize you're describing exactly the traits of Hillary Clinton, Bill Clinton, and Obama? You're such a hypocrite."   a political jab with real bite. Labeled mid-band — hostile, but no slurs.</p>
+</div>
+<div class="ex">
+  <p class="fa">روش فوق‌العاده‌ای برای ساخت بزرگراه‌های مدرن و ایمن‌تر است. باید در اولویت اول باشد.</p>
+  <div class="opts">
+    <p class="ol">Score levels — pick one:</p>
+    <p class="fa-q">کدام بازه با رتبه‌بندی سمیت ارزیابان برای این نظر مطابقت دارد؟</p>
+    <div class="chips">
+      <span class="chip win">بسیار کم: زیر 0.2 <code>very low</code></span>
+      <span class="chip">کم: 0.2 تا زیر 0.5 <code>low</code></span>
+      <span class="chip">متوسط: 0.5 تا زیر 0.8 <code>medium</code></span>
+      <span class="chip">زیاد: حداقل 0.8 <code>high</code></span>
+    </div>
+    <p class="note">Same row also carries a binary <code>toxic_comment</code> flag plus threat / insult / identity-attack / obscene sub-flags — all answered in one pass.</p>
+  </div>
+  <p class="ex-t">"An excellent way to build modern and safer highways. It should be a first priority."   strong opinion, zero hostility: labeled the mildest band. This is what separates sentiment from toxicity   the model has to score both on the same scale.</p>
+</div>
+</div>
+
+<div id="catp-intent" style="display:none">
+<div class="ex">
+  <p class="fa">چطور می‌توانم یک کارت جایگزین بگیرم؟</p>
+  <div class="opts">
+    <p class="ol">Choose one of five:</p>
+    <p class="fa-q">کدام قصد پشتیبانی با پیام مشتری مطابقت بیشتری دارد؟</p>
+    <div class="chips">
+      <span class="chip win">دریافت کارت جایگزین <code>getting_spare_card</code></span>
+      <span class="chip">دریافت کارت مجازی <code>getting_virtual_card</code></span>
+      <span class="chip">شارژ توسط کارت <code>topping_up_by_card</code></span>
+      <span class="chip">دریافت کارت مجازی یک‌بار مصرف <code>get_disposable_virtual_card</code></span>
+      <span class="chip">دریافت کارت فیزیکی <code>get_physical_card</code></span>
+    </div>
+  </div>
+  <p class="ex-t">"How can I get a replacement card?"   matched to the <code>getting_spare_card</code> intent out of five options, which is what hands the ticket to the right team automatically.</p>
+</div>
+<div class="ex">
+  <p class="fa">من چیزی رو به فروشگاه برگردوندم اما هنوز مبلغ استردادم رو نمی‌بینم.</p>
+  <div class="opts">
+    <p class="ol">Choose one of five:</p>
+    <p class="fa-q">کدام قصد پشتیبانی با پیام مشتری مطابقت بیشتری دارد؟</p>
+    <div class="chips">
+      <span class="chip win">عدم نمایش مبلغ استرداد <code>Refund_not_showing_up</code></span>
+      <span class="chip">کارت کار نمی‌کند <code>card_not_working</code></span>
+      <span class="chip">شارژ در انتظار <code>pending_top_up</code></span>
+      <span class="chip">کارت مجازی کار نمی‌کند <code>virtual_card_not_working</code></span>
+      <span class="chip">پرداخت بدون تماس کار نمی‌کند <code>contactless_not_working</code></span>
+    </div>
+  </div>
+  <p class="ex-t">"I returned something to the store but I still don't see my refund."   labeled <code>Refund_not_showing_up</code>, not <code>card_not_working</code> or <code>pending_top_up</code>. The criteria are written in Farsi, the labels are codes.</p>
+</div>
+</div>
+
+<div id="catp-retail" style="display:none">
+<div class="ex">
+  <p class="fa">آیا این جلسه خرید با خرید به پایان رسید؟</p>
+  <p class="jstate">{"Administrative": 11, "Administrative_Duration": 225.22,
+"Informational": 2, "Informational_Duration": 106.8,
+"ProductRelated": 68, "ProductRelated_Duration": 1607.17,
+"BounceRates": 0.0114, "ExitRates": 0.0333,
+"PageValues": 0, "Month": "Sep", "Weekend": false,
+"VisitorType": "Returning_Visitor"}</p>
+  <div class="opts">
+    <p class="ol">Possible answers:</p>
+    <div class="chips"><span class="chip win">true</span><span class="chip">false</span></div>
+  </div>
+  <p class="ex-t">"Did this shopping session end in a purchase?"   the state isn't text at all, it's a JSON session: nearly 70 product pages viewed, long admin and info activity, a low bounce rate. Answer: <code>true</code>. Same model, same wire format, no scrolling input required.</p>
+</div>
+<div class="ex">
+  <p class="fa">آیا این جلسه خرید مشاهده شده به خرید منجر شد؟</p>
+  <p class="jstate">{"Administrative": 0, "Informational": 0,
+"ProductRelated": 12, "ProductRelated_Duration": 127.0,
+"BounceRates": 0.0167, "ExitRates": 0.0417,
+"PageValues": 0, "Month": "Mar", "Weekend": false,
+"VisitorType": "Returning_Visitor"}</p>
+  <div class="opts">
+    <p class="ol">Possible answers — and a second question on the same pass:</p>
+    <div class="chips"><span class="chip">true</span><span class="chip win">false</span></div>
+    <p class="note">This row also asks <code>product_browsing_duration</code> — score over the real levels:</p>
+    <div class="chips"><span class="chip">هیچ: 0 ثانیه</span><span class="chip">کوتاه: زیر 60 ثانیه</span><span class="chip win">متوسط: 60 تا زیر 600 ثانیه</span><span class="chip">طولانی: حداقل 600 ثانیه</span></div>
+  </div>
+  <p class="ex-t">"Did the observed shopping session lead to a purchase?"   the opposite shape: twelve quick product-page hits, no admin pages, no purchase. Answer: <code>false</code>. A short JSON blob, a yes/no question, one calibrated probability out.</p>
+</div>
+</div>
+</section>
+
+<!-- ============ PAGE 4: try it yourself ============ -->
+<section id="page-code" style="display:none">
+<h1>Try it yourself</h1>
+<p class="sub">This whole script is the demo: pull the fine-tuned intent-routing
+model from Hugging&nbsp;Face and ask it one real question from the test set.
+First run downloads the weights (~600&nbsp;MB), after that it's cached.</p>
+<pre class="code"><span class="k">import</span> laya
+
+MODEL = <span class="s">"mo-shadfar/laya-fa-intent-routing"</span>
+
+STATE = <span class="s">"مبلغ استرداد در حساب من نمایش داده نمی‌شود."</span>
+
+QUESTIONS = {
+    <span class="s">"support_intent"</span>: {
+        <span class="s">"type"</span>: <span class="s">"choice"</span>,
+        <span class="s">"instructions"</span>: <span class="s">"کدام قصد پشتیبانی با پیام مشتری مطابقت بیشتری دارد؟"</span>,
+        <span class="s">"criteria"</span>: {
+            <span class="s">"Refund_not_showing_up"</span>: <span class="s">"عدم نمایش مبلغ استرداد"</span>,
+            <span class="s">"card_not_working"</span>: <span class="s">"کارت کار نمی‌کند"</span>,
+            <span class="s">"pending_top_up"</span>: <span class="s">"شارژ در انتظار"</span>,
+            <span class="s">"virtual_card_not_working"</span>: <span class="s">"کارت مجازی کار نمی‌کند"</span>,
+            <span class="s">"contactless_not_working"</span>: <span class="s">"پرداخت بدون تماس کار نمی‌کند"</span>,
+        },
+    }
+}
+
+<span class="c"># gold label for this is: Refund_not_showing_up</span>
+
+<span class="k">def</span> main():
+    agent = laya.load(MODEL)
+    answers = agent.predict(STATE, QUESTIONS)[<span class="s">"answers"</span>]
+    a = answers[<span class="s">"support_intent"</span>]
+    <span class="k">print</span>(<span class="s">"pred:"</span> + a[<span class="s">"choice"</span>] + <span class="s">"  confidence:"</span> + str(a[<span class="s">"confidence"</span>]))
+
+
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    main()</pre>
+<p class="ex-t" style="margin-top:16px">The message is Persian and the five
+options come straight from the data. The correct label for this row is <code>Refund_not_showing_up</code>, so the
+printout should read <code>pred: Refund_not_showing_up</code> with a confident
+probability attached. Swap <code>MODEL</code> for any of the other
+three fine-tuned repos and the same lines work unchanged.</p>
+</section>
+</main>
+<script>
+// ---- tabs ----
+function show(page){
+  for (const p of ["race","story","ex","code"]) document.getElementById("page-"+p).style.display = p===page?"":"none";
+  document.getElementById("tab-race").classList.toggle("on", page==="race");
+  document.getElementById("tab-story").classList.toggle("on", page==="story");
+  document.getElementById("tab-ex").classList.toggle("on", page==="ex");
+  document.getElementById("tab-code").classList.toggle("on", page==="code");
+  try{ localStorage.setItem("page", page) }catch(e){}
+}
+// ---- example categories ----
+function showCat(cat){
+  for (const c of ["spam","sent","intent","retail"]) document.getElementById("catp-"+c).style.display = c===cat?"":"none";
+  for (const c of ["spam","sent","intent","retail"]) document.getElementById("cat-"+c).classList.toggle("on", c===cat);
+  try{ localStorage.setItem("excat", cat) }catch(e){}
+}
+try{ show(localStorage.getItem("page")||"story") }catch(e){ show("story") }
+try{ showCat(localStorage.getItem("excat")||"spam") }catch(e){ showCat("spam") }
+
+// ---- race data ----
+const SUBSETS = [
+  {name:"retail_shopping", n:3359, acc:[.940,.845]},
+  {name:"sentiment_moderation", n:4394, acc:[.858,.726]},
+  {name:"spam_detection", n:271, acc:[.985,.967]},
+  {name:"support_intent_routing", n:2087, acc:[.981,.905]},
+];
+const avg = a => a.reduce((s,v)=>s+v,0)/a.length;
+const pct = v => (v*100).toFixed(1);
+
+const avgL = avg(SUBSETS.map(s=>s.acc[0])), avgJ = avg(SUBSETS.map(s=>s.acc[1]));
+document.getElementById("avgL").textContent = pct(avgL)+"%";
+document.getElementById("avgJ").textContent = pct(avgJ)+"%";
+document.getElementById("deltaAvg").textContent = "+"+((avgL-avgJ)*100).toFixed(1)+" pts for Laya";
+
+const holder = document.getElementById("cards");
+for (const s of SUBSETS) {
+  const [a, b] = s.acc;
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="chead"><h3>${s.name}</h3><span class="delta">+${((a-b)*100).toFixed(1)} pts</span></div>
+    <div class="mrow">
+      <div class="brow"><span class="name">Laya (ft)</span>
+        <div class="track"><div class="bar laya" data-w="${pct(a)}"></div></div>
+        <span class="val" style="color:var(--laya)">${a.toFixed(3)}</span></div>
+      <div class="brow"><span class="name">Jev-1.13</span>
+        <div class="track"><div class="bar jev" data-w="${pct(b)}"></div></div>
+        <span class="val" style="color:var(--jev)">${b.toFixed(3)}</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-top:4px">${s.n} test cases</div>`;
+  holder.appendChild(card);
+}
+// animate bars in after paint so the transition runs
+requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  for (const b of document.querySelectorAll(".bar")) b.style.width = b.dataset.w+"%";
+}));
+</script>
